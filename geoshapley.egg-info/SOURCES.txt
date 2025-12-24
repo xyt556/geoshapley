@@ -1,0 +1,12 @@
+MANIFEST.in
+README.md
+requirements.txt
+setup.py
+geoshapley/__init__.py
+geoshapley/geoshapley.py
+geoshapley.egg-info/PKG-INFO
+geoshapley.egg-info/SOURCES.txt
+geoshapley.egg-info/dependency_links.txt
+geoshapley.egg-info/entry_points.txt
+geoshapley.egg-info/requires.txt
+geoshapley.egg-info/top_level.txt

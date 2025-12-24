@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: geoshapley
+Version: 0.1.0.0
+Summary: GeoShapley value for measuring spatial effects
+Home-page: https://github.com/Ziqi-Li/geoshapley
+Author: Ziqi Li
+Author-email: liziqi1992@gmail.com
+License: MIT
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: tqdm
+Requires-Dist: scipy
+Requires-Dist: shap
+Requires-Dist: joblib
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary
+
+GeoShapley: A game theory based approach to measuring spatial effects from machine learning models
