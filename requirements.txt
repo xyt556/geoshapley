@@ -1,6 +1,34 @@
-numpy
-pandas
-tqdm
-scipy
-shap
-joblib
+# Core dependencies for GeoShapley
+numpy>=1.20.0
+pandas>=1.3.0
+tqdm>=4.60.0
+scipy>=1.7.0
+shap>=0.40.0
+joblib>=1.0.0
+
+# Streamlit web application framework
+streamlit>=1.20.0
+
+# Machine learning libraries
+scikit-learn>=1.0.0
+flaml[automl]>=2.0.0
+
+# Visualization libraries
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Optional dependencies for enhanced functionality
+# Uncomment if you need these features:
+
+# For GWR smoothing in SVC calculation
+mgwr>=2.1.0
+
+# For GAM smoothing curves in partial dependence plots
+pygam>=0.8.0
+
+# For geographic data processing (if needed)
+geopandas>=0.11.0
+
+# For Jupyter notebook support (if needed)
+jupyter>=1.0.0
+ipykernel>=6.0.0

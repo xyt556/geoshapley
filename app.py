@@ -95,6 +95,12 @@ if 'svc' not in st.session_state:
     st.session_state.svc = None
 if 'svc_features' not in st.session_state:
     st.session_state.svc_features = None
+if 'coord_cols' not in st.session_state:
+    st.session_state.coord_cols = None
+if 'svc_coords' not in st.session_state:
+    st.session_state.svc_coords = None
+if 'svc_coord_cols' not in st.session_state:
+    st.session_state.svc_coord_cols = None
 
 # Page 1: Data Upload
 if page == "Data Upload":
@@ -513,86 +519,96 @@ elif page == "Results Visualization":
                         
                         st.session_state.svc = svc
                         st.session_state.svc_features = selected_features
+                        st.session_state.svc_coords = coords
+                        st.session_state.svc_coord_cols = coord_cols
                         st.success(f"✅ SVC calculation completed! Calculated spatially varying coefficients for {len(selected_features)} feature(s)")
-                        
-                        # Display SVC statistics
-                        st.markdown("#### 📊 SVC Statistics")
-                        svc_df = pd.DataFrame(svc, columns=selected_features)
-                        st.dataframe(svc_df.describe(), use_container_width=True)
-                        
-                        # Visualization options
-                        st.markdown("#### 🎨 SVC Visualization")
-                        viz_type = st.selectbox(
-                            "Select Visualization Type",
-                            ["Scatter Plot", "Heatmap", "Statistical Plot"]
-                        )
-                        
-                        if viz_type == "Scatter Plot":
-                            # Create scatter plots for each feature
-                            num_features = len(selected_features)
-                            num_cols = min(3, num_features)
-                            num_rows = (num_features + num_cols - 1) // num_cols
-                            
-                            fig, axes = plt.subplots(num_rows, num_cols, figsize=(5*num_cols, 4*num_rows))
-                            if num_rows == 1:
-                                axes = [axes] if num_cols == 1 else axes
-                            else:
-                                axes = axes.flatten()
-                            
-                            for idx, feature in enumerate(selected_features):
-                                ax = axes[idx]
-                                scatter = ax.scatter(coords[:, 0], coords[:, 1], 
-                                                     c=svc[:, idx], cmap='viridis', 
-                                                     s=30, alpha=0.6)
-                                ax.set_xlabel(coord_cols[0])
-                                ax.set_ylabel(coord_cols[1])
-                                ax.set_title(f'Spatially Varying Coefficient: {feature}')
-                                plt.colorbar(scatter, ax=ax)
-                            
-                            # Hide extra subplots
-                            for idx in range(num_features, len(axes)):
-                                axes[idx].axis('off')
-                            
-                            plt.tight_layout()
-                            st.pyplot(fig)
-                            plt.close()
-                        
-                        elif viz_type == "Heatmap":
-                            # Create heatmap matrix
-                            fig, ax = plt.subplots(figsize=(10, 6))
-                            im = ax.imshow(svc.T, aspect='auto', cmap='RdYlBu_r', interpolation='nearest')
-                            ax.set_yticks(range(len(selected_features)))
-                            ax.set_yticklabels(selected_features)
-                            ax.set_xlabel('Sample Index')
-                            ax.set_title('Spatially Varying Coefficients Heatmap')
-                            plt.colorbar(im, ax=ax, label='SVC Value')
-                            plt.tight_layout()
-                            st.pyplot(fig)
-                            plt.close()
-                        
-                        elif viz_type == "Statistical Plot":
-                            # Create box plot
-                            fig, ax = plt.subplots(figsize=(10, 6))
-                            svc_df.boxplot(ax=ax, rot=45)
-                            ax.set_ylabel('SVC Value')
-                            ax.set_title('Spatially Varying Coefficients Distribution')
-                            plt.tight_layout()
-                            st.pyplot(fig)
-                            plt.close()
-                        
-                        # Download SVC data
-                        st.markdown("#### 📥 Download SVC Data")
-                        csv = svc_df.to_csv(index=False).encode('utf-8-sig')
-                        st.download_button(
-                            label="Download SVC Data (CSV)",
-                            data=csv,
-                            file_name="svc_coefficients.csv",
-                            mime="text/csv"
-                        )
                         
                 except Exception as e:
                     st.error(f"Calculation failed: {str(e)}")
                     st.exception(e)
+            
+            # Display SVC results and visualizations if SVC has been calculated
+            if st.session_state.svc is not None and st.session_state.svc_features is not None:
+                svc = st.session_state.svc
+                svc_features = st.session_state.svc_features
+                coords = st.session_state.svc_coords
+                coord_cols = st.session_state.svc_coord_cols
+                
+                # Display SVC statistics
+                st.markdown("#### 📊 SVC Statistics")
+                svc_df = pd.DataFrame(svc, columns=svc_features)
+                st.dataframe(svc_df.describe(), use_container_width=True)
+                
+                # Visualization options
+                st.markdown("#### 🎨 SVC Visualization")
+                viz_type = st.selectbox(
+                    "Select Visualization Type",
+                    ["Scatter Plot", "Heatmap", "Statistical Plot"],
+                    key="svc_viz_type"
+                )
+                
+                if viz_type == "Scatter Plot":
+                    # Create scatter plots for each feature
+                    num_features = len(svc_features)
+                    num_cols = min(3, num_features)
+                    num_rows = (num_features + num_cols - 1) // num_cols
+                    
+                    fig, axes = plt.subplots(num_rows, num_cols, figsize=(5*num_cols, 4*num_rows))
+                    if num_rows == 1:
+                        axes = [axes] if num_cols == 1 else axes
+                    else:
+                        axes = axes.flatten()
+                    
+                    for idx, feature in enumerate(svc_features):
+                        ax = axes[idx]
+                        scatter = ax.scatter(coords[:, 0], coords[:, 1], 
+                                             c=svc[:, idx], cmap='viridis', 
+                                             s=30, alpha=0.6)
+                        ax.set_xlabel(coord_cols[0])
+                        ax.set_ylabel(coord_cols[1])
+                        ax.set_title(f'Spatially Varying Coefficient: {feature}')
+                        plt.colorbar(scatter, ax=ax)
+                    
+                    # Hide extra subplots
+                    for idx in range(num_features, len(axes)):
+                        axes[idx].axis('off')
+                    
+                    plt.tight_layout()
+                    st.pyplot(fig)
+                    plt.close()
+                
+                elif viz_type == "Heatmap":
+                    # Create heatmap matrix
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    im = ax.imshow(svc.T, aspect='auto', cmap='RdYlBu_r', interpolation='nearest')
+                    ax.set_yticks(range(len(svc_features)))
+                    ax.set_yticklabels(svc_features)
+                    ax.set_xlabel('Sample Index')
+                    ax.set_title('Spatially Varying Coefficients Heatmap')
+                    plt.colorbar(im, ax=ax, label='SVC Value')
+                    plt.tight_layout()
+                    st.pyplot(fig)
+                    plt.close()
+                
+                elif viz_type == "Statistical Plot":
+                    # Create box plot
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    svc_df.boxplot(ax=ax, rot=45)
+                    ax.set_ylabel('SVC Value')
+                    ax.set_title('Spatially Varying Coefficients Distribution')
+                    plt.tight_layout()
+                    st.pyplot(fig)
+                    plt.close()
+                
+                # Download SVC data
+                st.markdown("#### 📥 Download SVC Data")
+                csv = svc_df.to_csv(index=False).encode('utf-8-sig')
+                st.download_button(
+                    label="Download SVC Data (CSV)",
+                    data=csv,
+                    file_name="svc_coefficients.csv",
+                    mime="text/csv"
+                )
         else:
             st.warning("⚠️ Please complete GeoShapley analysis first to calculate spatially varying coefficients")
 
